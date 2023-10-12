@@ -6,10 +6,12 @@ import com.p6spy.engine.spy.appender.MessageFormattingStrategy;
 import jakarta.annotation.PostConstruct;
 import java.util.Locale;
 import org.hibernate.engine.jdbc.internal.FormatStyle;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * p6Spy 설정 : 쿼리 로그의 가독성 높임
  */
+@Configuration
 public class P6SpyFormatter implements MessageFormattingStrategy {
 
   @PostConstruct
