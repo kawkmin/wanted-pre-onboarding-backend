@@ -33,7 +33,7 @@
 
 ## ERD
 
-![image](https://github.com/kawkmin/wanted-pre-onboarding-backend/assets/86940335/d97ebcd8-cf47-46c4-8ba8-94b56a11e0d3)
+![image](https://github.com/kawkmin/wanted-pre-onboarding-backend/assets/86940335/2a787849-5987-4ef6-abf2-9c7e916db1ae)
 
 ## 요구사항 구현 과정
 

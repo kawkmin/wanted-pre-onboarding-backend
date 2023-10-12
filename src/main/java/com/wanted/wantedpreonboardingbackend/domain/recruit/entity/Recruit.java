@@ -4,7 +4,6 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
-import com.wanted.wantedpreonboardingbackend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,11 +29,6 @@ public class Recruit {
   @GeneratedValue(strategy = IDENTITY)
   @Column(name = "id", nullable = false)
   private Long id;
-
-  //유저 (N:1)
-  @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
 
   //회사 (N:1)
   @ManyToOne(fetch = LAZY)
