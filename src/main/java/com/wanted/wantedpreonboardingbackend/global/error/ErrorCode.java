@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 public enum ErrorCode {
-
+  //회사
+  COMPANY_NOT_FOUND("해당 회사를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   ;
 
   //오류 메시지
