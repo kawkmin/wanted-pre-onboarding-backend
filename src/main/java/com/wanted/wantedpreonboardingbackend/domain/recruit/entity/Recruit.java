@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,4 +52,12 @@ public class Recruit {
   @Column(name = "skill", nullable = false, length = MAX_SKILL_LENGTH)
   private String skill;
 
+  @Builder
+  public Recruit(Company company, String position, Integer reward, String content, String skill) {
+    this.company = company;
+    this.position = position;
+    this.reward = reward;
+    this.content = content;
+    this.skill = skill;
+  }
 }
