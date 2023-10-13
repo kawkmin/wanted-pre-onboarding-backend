@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,9 @@ public class Company {
   //회사 이름
   @Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
   private String name;
+
+  @Builder
+  public Company(String name) {
+    this.name = name;
+  }
 }
