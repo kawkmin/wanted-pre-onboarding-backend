@@ -1,8 +1,10 @@
 package com.wanted.wantedpreonboardingbackend.domain.company.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.wanted.wantedpreonboardingbackend.TestHelper;
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +24,7 @@ class CompanyRepositoryTest extends TestHelper {
 
   @BeforeEach
   void setUp() {
+    // db에 테스트용 회사 저장
     company = companyRepository.save(companyTestHelper.generate());
   }
 
@@ -34,7 +37,16 @@ class CompanyRepositoryTest extends TestHelper {
     void id로_회사_조회를_할_수_있어야_한다() {
       Company findCompany = companyRepository.findById(company.getId()).orElseThrow();
 
-      Assertions.assertThat(company.getId()).isEqualTo(findCompany.getId());
+      assertThat(company.getId()).isEqualTo(findCompany.getId());
+    }
+
+    @Test
+    @DisplayName("없는 회사 id로 조회 할 수 없다.")
+    void 없는_회사_id로_조회_할_수_없다() {
+      assertThatThrownBy(
+          () -> companyRepository.findById(100L).orElseThrow()
+      );
+
     }
   }
 }
