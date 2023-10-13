@@ -346,6 +346,117 @@ public class RecruitController {
 
 관련 PR :
 
+### Unit Test 구현.
+
+테스트를 할 때, 생성관련 중복되는 경우가 너무 많기에 각 도메인마다 Entity 생성을 도와주는 `{domain}TestHelper`가 존재합니다.
+
+모든 테스트틑 이런 `testHelper`들이 선언된 `TestHelper`클래스를 상속받아, 쉽게 Entity를 생성을 할 수 있게 구현하였습니다.
+
+`TestHelper Class`
+
+```java
+/**
+ * 모든 테스트 헬퍼를 가진 부모 클래스
+ */
+public class TestHelper {
+
+  //...testHelper 선언
+
+  @PostConstruct
+  public void init() {
+    //...testHelper 주입
+  }
+}
+```
+
+`CompanyTestHelper`
+
+```java
+/**
+ * 회사 테스트 헬퍼
+ */
+public class CompanyTestHelper {
+
+  public Company generate() {
+    return this.builder().build();
+  }
+
+  public CompanyBuilder builder() {
+    return new CompanyBuilder();
+  }
+
+  public final class CompanyBuilder {
+
+    private String name;
+
+    public CompanyBuilder() {
+    }
+
+    public CompanyBuilder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Company build() {
+      return Company.builder()
+          .name(name != null ? name : "테스트 회사 이름")
+          .build();
+    }
+  }
+}
+
+```
+
+`testHelper`들은 `.generate`로 쉽게 디폴트값 주입이 가능하며, `Builder` 형식으로 쉽게 커스텀이 가능합니다.
+
+**1. DAO 계층**
+
+`@DataJpaTest`로 DB를 사용하여, 테스트 구현합니다.
+
+```java
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class RecruitRepositoryTest extends TestHelper {
+  //...
+}
+```
+
+**2. Service 계층**
+
+`Mock`를 사용하여, 테스트를 구현합니다.
+
+**(주의사항 : service는 다른 service를 의존해선 안됩니다.)**
+
+```java
+
+@ExtendWith(MockitoExtension.class)
+class RecruitServiceTest extends TestHelper {
+
+  @InjectMocks
+  private RecruitService recruitService;
+  @Mock
+  private RecruitRepository recruitRepository;
+  //...
+}
+```
+
+**3. Controller 계층**
+
+`Mock`와 `MockMVC`를 사용하여, 실제 Request와 Response가 있는 것 처럼 테스트 합니다.
+
+```java
+
+@ExtendWith(MockitoExtension.class)
+class RecruitControllerTest extends TestHelper {
+
+  private MockMvc mockMvc;
+  //...
+}
+```
+
+하지만 실제 동작에선 다를 가능성이 있으니, 통합 테스트를 구현하거나, `PostMan`등을 사용하여 추가적인 테스트가 필요합니다.
+
 ## API 명세(Request/Response)
 
 ### 1. 채용공고 등록
