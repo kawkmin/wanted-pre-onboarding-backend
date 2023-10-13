@@ -1,6 +1,7 @@
 package com.wanted.wantedpreonboardingbackend;
 
 import com.wanted.wantedpreonboardingbackend.domain.company.CompanyTestHelper;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.RecruitTestHelper;
 import jakarta.annotation.PostConstruct;
 
 /**
@@ -9,9 +10,11 @@ import jakarta.annotation.PostConstruct;
 public class TestHelper {
 
   protected CompanyTestHelper companyTestHelper;
+  protected RecruitTestHelper recruitTestHelper;
 
   @PostConstruct
-  void setUp() {
+  public void init() {
     companyTestHelper = new CompanyTestHelper();
+    recruitTestHelper = new RecruitTestHelper(companyTestHelper);
   }
 }
