@@ -28,9 +28,8 @@ public class RecruitService {
   @Transactional
   public Long createRecruit(RecruitCreateReqDto reqDto, Long companyId) {
     Company company = companyService.getCompanyById(companyId); //Id로 회사 가져오기
-    Recruit recruit = reqDto.toEntity(company); //생성될 채용공고
-    recruitRepository.save(recruit); //생성
 
+    Recruit recruit = recruitRepository.save(reqDto.toEntity(company));//생성
     return recruit.getId();
   }
 }
