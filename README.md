@@ -352,7 +352,43 @@ public class RecruitController {
 
 #### Request
 
+- POST `/api/v1/recruit`
+
+```json
+{
+  "companyId": 1,
+  "position": "백엔드 주니어 개발자",
+  "reward": 1000000,
+  "content": "원티드랩에서 백엔드 주니어 개발자를 채용합니다. 자격요건은..",
+  "skill": "Python"
+}
+```
+
 #### Response
+
+- 201 Created
+- `Location` : `/recruit/{채용공고 ID}`
+
+```json
+
+```
+
+- 400 Bad Request
+
+```json
+{
+  "message": "[null] content: 채용 내용을 입력해주세요."
+}
+...
+```
+
+- 404 Not Found
+
+```json
+{
+  "message": "[100] companyId: 해당 회사를 찾을 수 없습니다."
+}
+```
 
 ### 2. 채용공고 수정
 
