@@ -62,4 +62,11 @@ public class Recruit {
     this.content = content;
     this.skill = skill;
   }
+
+  public void update(Recruit recruit) {
+    this.position = recruit.position != null ? recruit.position : this.position;
+    this.reward = recruit.reward != null ? recruit.reward : this.reward;
+    this.content = recruit.content != null ? recruit.content : this.content;
+    this.skill = recruit.skill != null ? recruit.skill : this.skill;
+  }
 }

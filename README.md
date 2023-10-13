@@ -45,7 +45,7 @@
 [#6](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6),
 [#9](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)
 
-[#2 개발 초기 환경 세팅](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/2)
+[[#2 개발 초기 환경 세팅]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/2)
 
 깃허브 PR 및 Issue 탬플릿을 만들어, 형식화된 틀을 사용하였습니다.
 
@@ -54,15 +54,15 @@
 
 요구사항을 분석하여, README에 정리하였습니다.
 
-[#4 erd 기반 entity 및 dao 생성](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/4),
-[#9 지원 정보 entity 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)(refactor)
+[[#4 erd 기반 entity 및 dao 생성]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/4),
+[[#9 지원 정보 entity 구현(refactor)]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)
 
 초기에 작성된 ERD를 기반으로, 요구사항에 맞는 Entity 및 DAO를 생성하였습니다.
 
 하지만 잘못된 요구사항 분석으로, 사용자와 채용공고는 N:1 관계가 아닌, N:N임을 알게되었습니다.
 이에, N:N의 중간 Entity인 `지원 정보 Entity`룰 생성하여, N:1 관계로 리팩토링 하였습니다.
 
-[#6 전역 예외 처리 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6)
+[[#6 전역 예외 처리 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6)
 
 API 통신에서 예외가 발생하면, 원치않은 상태코드 및 메시지를 전송하게 됩니다. 이를 방지하여, 예외 처리를 다음과 같이 직접 구현하였습니다.
 
@@ -207,7 +207,7 @@ public class ExceptionAdvice {
 
 관련 PR : [#10](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
 
-[#10 채용공고 등록 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
+[[#10 채용공고 등록 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
 
 채용 관련 `Controller`에서 `ResponseBody`로 받을 때, `Bean Validation`을 이용하여, 다음과 같이 제약 조건을 걸었습니다.
 
