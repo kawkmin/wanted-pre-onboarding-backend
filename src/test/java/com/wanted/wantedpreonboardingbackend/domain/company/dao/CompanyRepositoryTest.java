@@ -1,6 +1,6 @@
 package com.wanted.wantedpreonboardingbackend.domain.company.dao;
 
-import com.wanted.wantedpreonboardingbackend.domain.company.CompanyTestHelper;
+import com.wanted.wantedpreonboardingbackend.TestHelper;
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class CompanyRepositoryTest {
-
-  private final CompanyTestHelper companyTestHelper = new CompanyTestHelper();
+class CompanyRepositoryTest extends TestHelper {
 
   @Autowired
   private CompanyRepository companyRepository;
