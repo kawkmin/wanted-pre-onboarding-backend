@@ -20,7 +20,7 @@
 ## 요구사항 분석
 
 - [ ] **회사**
-    - [ ] **채용공고**를 등록을 할 수 있다.
+    - [x] **채용공고**를 등록을 할 수 있다.
     - [ ] **채용공고**를 수정을 할 수 있다.
     - [ ] **채용공고**를 삭제를 할 수 있다.
 
@@ -205,7 +205,122 @@ public class ExceptionAdvice {
 
 ### 1. 채용공고를 등록합니다.
 
-관련 PR :
+관련 PR : [#10](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
+
+[#10 채용공고 등록 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
+
+채용 관련 `Controller`에서 `ResponseBody`로 받을 때, `Bean Validation`을 이용하여, 다음과 같이 제약 조건을 걸었습니다.
+
+```java
+/**
+ * 채용공고를 만들 때, Reqest Dto
+ */
+public class RecruitCreateReqDto {
+
+  public static final int MIN_REWARD_PRICE = 0;
+
+  //회사 Id (N:1)
+  @NotNull(message = "회사 아이디를 입력해주세요.")
+  @PositiveOrZero(message = "올바른 회사 아이디를 입력해주세요.")
+  private Long companyId;
+
+  //채용 포지션명
+  @NotNull(message = "포지션을 입력해주세요.")
+  private String position;
+
+  //보상금
+  @Nullable
+  private Integer reward;
+
+  //채용 내용
+  @NotNull(message = "채용 내용을 입력해주세요.")
+  private String content;
+
+  //사용 기술명
+  @NotNull(message = "사용 기술명을 입력해주세요.")
+  private String skill;
+}
+```
+
+이 때, 주입에서 오류가 발생하면, `BindException`이 일어나는데, 위에서 이미 `ExceptionAdvice`로 처리해주었습니다.
+
+이를 이용하여, 먼저 `회사Service`에서 id로 회사 찾기 기능을 구현하였으며, 못찾을 시, `BusinessException`를 발생시킵니다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CompanyService {
+  //...
+
+  /**
+   * id로 회사 조회
+   *
+   * @param companyId 회사 id
+   * @return 조회된 회사 Entity
+   */
+  public Company getCompanyById(Long companyId) {
+    Company company = companyRepository.findById(companyId).orElseThrow(
+        () -> new BusinessException(companyId, "companyId", ErrorCode.COMPANY_NOT_FOUND)
+    );
+  }
+}
+```
+
+이를 이용하여, 찾은 `Company`와 `ReqDto`를 통하여, `service`에서 `Recruit`를 저장합니다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RecruitService {
+  //...
+
+  /**
+   * 채용공고 생성
+   *
+   * @param reqDto  채용공고 생성 Request Dto
+   * @param company 관계 회사
+   * @return 생성된 채용공고 ID
+   */
+  @Transactional
+  public Long createRecruit(RecruitCreateReqDto reqDto, Company company) {
+    Recruit recruit = recruitRepository.save(reqDto.toEntity(company));//생성
+    return recruit.getId();
+  }
+}
+```
+
+비지니스 로직상 자연스럽게 해당 채용공고로 이동한다고 생각하여, `Controller`에서 `201`상태코드와 `Header`의 `Location`에 `생성된 채용공고 뷰 URL`
+을 담습니다.
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/recruit")
+public class RecruitController {
+  //...
+
+  /**
+   * 채용공고 생성
+   *
+   * @param reqDto 채용공고 생성 Request Dto
+   * @return 201, 생성된 채용공고 location
+   */
+  @PostMapping("")
+  public ResponseEntity<Void> createRecruit(
+      @RequestBody @Valid RecruitCreateReqDto reqDto
+  ) {
+    //...
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .location(URI.create("/recruit/" + createdRecruitId)) //생성된 채용공고 조회 url 담기
+        .build();
+  }
+}
+```
 
 ### 2. 채용공고를 수정합니다.
 
