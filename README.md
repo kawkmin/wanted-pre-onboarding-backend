@@ -639,12 +639,24 @@ public class CompanyTestHelper {
 
 **1. DAO 계층**
 
+속도가 빠른 `H2 DB`를 사용하여, 테스트를 하도록 합니다.
+
+`build.gradle`
+
+```java
+dependencies{
+    //...
+
+    //테스트용 H2 DB
+    testImplementation'com.h2database:h2'
+    }
+```
+
 `@DataJpaTest`로 DB를 사용하여, 테스트 구현합니다.
 
 ```java
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RecruitRepositoryTest extends TestHelper {
   //...
 }
