@@ -12,12 +12,12 @@
 4. [구현과정](#요구사항-구현-과정)
 5. [Api 명세](#api-명세requestresponse)
 
-## 서비스 개요
+## [서비스 개요](#목차)
 
 - 본 서비스는 기업의 채용을 위한 웹 서비스 입니다.
 - 회사는 채용공고를 생성하고, 이에 사용자는 지원합니다.
 
-## 요구사항 분석
+## [요구사항 분석](#목차)
 
 - [x] **회사**
     - [x] **채용공고**를 등록을 할 수 있다.
@@ -31,13 +31,29 @@
     - [x] **채용공고** 상세 페이지를 확인할 수 있다.
     - [x] **채용공고**에 지원할 수 있다.
 
-## ERD
+## [ERD](#목차)
 
 ![image](https://github.com/kawkmin/wanted-pre-onboarding-backend/assets/86940335/ac7a31c6-bbad-4b1d-9c73-e7680cb0a478)
 
-## 요구사항 구현 과정
+## [요구사항 구현 과정](#목차)
 
-### 0. 프로젝트 틀을 구성합니다.
+[0. 프로젝트 틀을 구성합니다.](#0-프로젝트-틀을-구성합니다)
+
+[1. 채용공고를 등록합니다.](#1-채용공고를-등록합니다)
+
+[2. 채용공고를 수정합니다.](#2-채용공고를-수정합니다)
+
+[3. 채용공고를 삭제합니다.](#3-채용공고를-삭제합니다)
+
+[4. 채용공고 목록을 가져옵니다. + 검색 기능 구현](#4-채용공고-목록을-가져옵니다--채용공고-검색-기능)
+
+[5. 채용공고 상세페이지를 구현합니다.](#5-채용-상세-페이지를-가져옵니다)
+
+[6. 사용자는 채용공고에 지원합니다.](#6-사용자는-채용공고에-지원합니다)
+
+[7. 단위 테스트 구현](#unit-test-구현)
+
+### [0. 프로젝트 틀을 구성합니다.](#요구사항-구현-과정)
 
 관련 PR :
 [#2](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/2),
@@ -203,7 +219,7 @@ public class ExceptionAdvice {
 
 이로써, 예외 발생 Response를 커스텀하였습니다.
 
-### 1. 채용공고를 등록합니다.
+### [1. 채용공고를 등록합니다.](#요구사항-구현-과정)
 
 관련 PR : [#10](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
 
@@ -322,7 +338,7 @@ public class RecruitController {
 }
 ```
 
-### 2. 채용공고를 수정합니다.
+### [2. 채용공고를 수정합니다.](#요구사항-구현-과정)
 
 관련 PR : [#12](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/12)
 
@@ -462,7 +478,7 @@ public class RecruitController {
 
 ```
 
-### 3. 채용공고를 삭제합니다.
+### [3. 채용공고를 삭제합니다.](#요구사항-구현-과정)
 
 관련 PR : [#14](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/14)
 
@@ -535,7 +551,7 @@ public class RecruitController {
 }
 ```
 
-### 4. 채용공고 목록을 가져옵니다. + 채용공고 검색 기능(선택 사항)
+### [4. 채용공고 목록을 가져옵니다 + 채용공고 검색 기능](#요구사항-구현-과정)
 
 관련 PR : [#16](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/16)
 
@@ -692,7 +708,7 @@ public class RecruitController {
 }
 ```
 
-### 5. 채용 상세 페이지를 가져옵니다.
+### [5. 채용 상세 페이지를 가져옵니다.](#요구사항-구현-과정)
 
 관련 PR : [#20](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/20)
 
@@ -781,7 +797,7 @@ public class RecruitService {
 
 `controller`에서 `200 상태코드`와 채용공고의 상세 정보를 `Response` 합니다.
 
-### 6. 사용자는 채용공고에 지원합니다.(선택 사항)
+### [6. 사용자는 채용공고에 지원합니다.](#요구사항-구현-과정)
 
 관련 PR : [#22](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/22)
 
@@ -876,7 +892,7 @@ public class MatchingController {
 }
 ```
 
-### Unit Test 구현.
+### [Unit Test 구현.](#요구사항-구현-과정)
 
 테스트를 할 때, 생성관련 중복되는 경우가 너무 많기에 각 도메인마다 Entity 생성을 도와주는 `{domain}TestHelper`가 존재합니다.
 
@@ -1022,7 +1038,7 @@ class RecruitControllerTest extends TestHelper {
 
 하지만 실제 동작에선 다를 가능성이 있으니, 통합 테스트를 구현하거나, `PostMan`등을 사용하여 추가적인 테스트가 필요합니다.
 
-## API 명세(Request/Response)
+### [API 명세(Request/Response)](#목차)
 
 ### 1. 채용공고 등록
 
@@ -1177,7 +1193,7 @@ class RecruitControllerTest extends TestHelper {
 }
 ```
 
-### 5. 채용공고 상세 페이지 조회
+### 5. 채용공고 상세 페이지 구현
 
 #### Request
 
