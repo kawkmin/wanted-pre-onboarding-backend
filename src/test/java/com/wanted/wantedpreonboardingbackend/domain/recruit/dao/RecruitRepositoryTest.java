@@ -1,6 +1,7 @@
 package com.wanted.wantedpreonboardingbackend.domain.recruit.dao;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import com.wanted.wantedpreonboardingbackend.TestHelper;
 import com.wanted.wantedpreonboardingbackend.domain.company.dao.CompanyRepository;
@@ -78,6 +79,23 @@ class RecruitRepositoryTest extends TestHelper {
 
       // 업데이트 내용 X
       assertThat(afterRecruit.getSkill()).isEqualTo(beforeRecruit.getSkill());
+    }
+  }
+
+  @Nested
+  @DisplayName("채용공고 삭제 테스트")
+  class RecruitDeleteTest {
+
+    @Test
+    @Transactional
+    @DisplayName("채용공고가 정상적으로 삭제 된다")
+    void 채용공고가_정상적으로_삭제_된다() {
+
+      recruitRepository.delete(recruit);
+
+      assertThatThrownBy(
+          () -> recruitRepository.findById(recruit.getId()).orElseThrow()
+      );
     }
   }
 }
