@@ -10,6 +10,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,4 +71,26 @@ public class RecruitController {
         .location(URI.create("/recruit/" + updatedRecruitId)) //수정된 채용공고 조회 url 담기
         .build();
   }
+
+  /**
+   * 채용공고 삭제
+   *
+   * @param companyId 회사 아이디
+   * @param recruitId 삭제할 채용공고 아이디
+   * @return 200
+   */
+  @DeleteMapping("/{companyId}/{recruitId}")
+  public ResponseEntity<Void> deleteRecruit(
+      @PathVariable Long companyId,
+      @PathVariable Long recruitId
+  ) {
+    // 회사 id로 가져온 회사
+    Company company = companyService.getCompanyById(companyId);
+
+    // 채용공고 삭제
+    recruitService.deleteRecruit(recruitId, company);
+
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
+
 }
