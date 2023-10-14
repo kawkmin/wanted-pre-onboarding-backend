@@ -25,11 +25,11 @@
     - [x] **채용공고**를 삭제를 할 수 있다.
 
 
-- [ ] **사용자**
+- [x] **사용자**
     - [x] **채용공고** 목록을 확인할 수 있다.
     - [x] 검색된 **채용공고** 목록을 확인할 수 있다.
     - [x] **채용공고** 상세 페이지를 확인할 수 있다.
-    - [ ] **채용공고**에 지원할 수 있다.
+    - [x] **채용공고**에 지원할 수 있다.
 
 ## ERD
 
@@ -783,7 +783,98 @@ public class RecruitService {
 
 ### 6. 사용자는 채용공고에 지원합니다.(선택 사항)
 
-관련 PR :
+관련 PR : [#22](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/22)
+
+[[#22 채용공고 지원 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/22)
+
+사용자가 여러 채용공고에 지원을 할 수 있으므로, N:N 관계이지만, 여러 이유로 N:N 관계는 만들면 안되었기에, `Matching`Entity를 통해
+N:N 관계로 바꾸었습니다.
+
+`유저id`와 `채용공고id`를 이용하여, 이전에 지원자가 지원을 한 기록이 있으면, 예외처리를 해주었고, 없으면 저장을 하였습니다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class MatchingService {
+
+  //...
+
+  /**
+   * 지원 정보를 생성한다
+   *
+   * @param user    지원자
+   * @param recruit 채용공고
+   * @return 지원 정보
+   */
+  @Transactional
+  public Long CreateMatching(User user, Recruit recruit) {
+
+    //사용자가 이전에 지원하면 예외 처리
+    isAlreadyMatch(user, recruit);
+
+    Matching matching = matchingRepository.save(Matching.builder()
+        .user(user)
+        .recruit(recruit)
+        .build());
+
+    return matching.getId();
+  }
+
+  /**
+   * 사용자가 이전에 지원했는지 확인 후, 예외 처리
+   *
+   * @param user    지원자
+   * @param recruit 채용공고
+   */
+  private static void isAlreadyMatch(User user, Recruit recruit) {
+    boolean anyMatch = recruit.getMatchings().stream()
+        .map(Matching::getUser)
+        .map(User::getId)
+        .anyMatch(id -> id.equals(user.getId()));
+
+    if (anyMatch) {
+      throw new BusinessException(user.getId(), "user", ErrorCode.ALREADY_MATCH);
+    }
+  }
+}
+
+```
+
+`controller`에서는, 지원정보 생성 후, 지원정보 상세보기로 갈 것을 예상하여 `header`의 `location`에 `/matching/{생성된  ID}` url을
+담았습니다.
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/matching")
+public class MatchingController {
+  //...
+
+  /**
+   * 지원 정보 생성
+   *
+   * @param recruitId 채용공고
+   * @param userId    지원자
+   * @return 201, 생성된 지원 정보 조회 url
+   */
+  @PostMapping("")
+  public ResponseEntity<Void> createMatching(
+      @RequestParam Long recruitId,
+      @RequestParam Long userId
+  ) {
+    Long createdMatchingId = matchingService.CreateMatching(userService.getUserById(userId),
+        recruitService.getRecruitById(recruitId));
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .location(URI.create("/matching/" + createdMatchingId)) //생성된 지원 정보 조회 url 담기
+        .build();
+  }
+
+}
+```
 
 ### Unit Test 구현.
 
@@ -1127,10 +1218,42 @@ class RecruitControllerTest extends TestHelper {
 }
 ```
 
-### 6. 채용공고 등록
+### 6. 채용공고 지원
 
 #### Request
 
+- Post `api/v1/matching`
+
+```json
+{
+  "recruitId": 11,
+  "userId": 1
+}
+```
+
 #### Response
+
+- 201 Created
+- `Location` : `/matching/{생성된  ID}`
+
+```json
+
+```
+
+- 400 Bad Request
+
+```json
+{
+  "message": "[1] user: 이미 지원한 사용자 입니다."
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "message": "[11] recruitId: 해당 채용공고를 찾을 수 없습니다."
+}
+```
 
 
