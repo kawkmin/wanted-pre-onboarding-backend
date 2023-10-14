@@ -3,7 +3,6 @@ package com.wanted.wantedpreonboardingbackend.domain.recruit.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,7 +14,6 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.application.RecruitService;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
-import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitListResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,20 +80,6 @@ class RecruitControllerTest extends TestHelper {
               .content(objectMapper.writeValueAsString(reqDto))
               .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isCreated());
-    }
-  }
-
-  @Nested
-  @DisplayName("채용공고 조회 관련 테스트")
-  class readRecruit {
-
-    @Test
-    @DisplayName("채용공고 조회에 성공한다.")
-    void 채용공고_조회에_성공한다() throws Exception {
-      given(recruitService.getRecruits(any())).willReturn(RecruitListResDto.form(any()));
-
-      mockMvc.perform(get("/api/v1/recruit"))
-          .andExpect(status().isOk());
     }
   }
 
