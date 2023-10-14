@@ -26,8 +26,8 @@
 
 
 - [ ] **사용자**
-    - [ ] **채용공고** 목록을 확인할 수 있다.
-    - [ ] 검색된 **채용공고** 목록을 확인할 수 있다.
+    - [x] **채용공고** 목록을 확인할 수 있다.
+    - [x] 검색된 **채용공고** 목록을 확인할 수 있다.
     - [ ] **채용공고** 상세 페이지를 확인할 수 있다.
     - [ ] **채용공고**에 지원할 수 있다.
 
@@ -535,13 +535,153 @@ public class RecruitController {
 }
 ```
 
-### 4-1. 채용공고 목록을 가져옵니다.
+### 4. 채용공고 목록을 가져옵니다. + 채용공고 검색 기능(선택 사항)
 
-관련 PR :
+관련 PR : [#16](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/16)
 
-### 4-2. 채용공고 검색 기능(선택 사항)
+[[#16 채용 공고 목록 조회 및 검색 기능 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/16)
 
-관련 PR :
+`...?search=?`를 통해서, 채용공고의 컬럼값 중 하나라도 포함이 된다면, 목록에 포함시켜 `Response` 해야합니다.
+
+또한, 대소문자 구분이 필요없다고 판단하였습니다. (Python과 python 등)
+
+따라서 다음과 같은 쿼리문을 작성하였습니다.
+`RecruitRepository`
+
+```java
+public interface RecruitRepository extends JpaRepository<Recruit, Long> {
+  //...
+
+  /**
+   * 검색명에 하나라도 일치
+   *
+   * @param search 검색명
+   * @return 조건에 맞는 채용공고 리스트
+   */
+  @Query(
+      "SELECT r " +
+          "FROM Recruit r " +
+          "join fetch r.company " +
+          "WHERE lower(r.content) LIKE lower(concat('%',:search,'%') )" +
+          "OR lower(r.position) LIKE lower(concat('%',:search,'%') )" +
+          "OR lower(r.skill) LIKE lower(concat('%',:search,'%') )" +
+          "OR lower(r.company.name) LIKE lower(concat('%',:search,'%') )" +
+          "OR lower(r.company.region) LIKE lower(concat('%',:search,'%') )" +
+          "OR lower(r.company.country) LIKE lower(concat('%',:search,'%') )"
+  )
+  List<Recruit> searchRecruits(@Param("search") String search);
+
+}
+```
+
+`채용공고 service`에서 해당 쿼리문을 이용하여, `Response`형식에 맞는 `DTO`로 반환합니다.
+
+```java
+/**
+ * 채용공고의 목록으로 보여줄 Response Dto
+ */
+@Getter
+@AllArgsConstructor
+public class RecruitResDto {
+
+  //채용공고 ID
+  private Long id;
+
+  //회사 이름
+  private String companyName;
+
+  //채용 포지션명
+  private String position;
+
+  //보상금
+  private Integer reward;
+
+  //채용 내용
+  private String content;
+
+  //사용 기술명
+  private String skill;
+
+  /**
+   * Entity로 Dto변경
+   *
+   * @param recruit 생성된 채용공고 Response Dto
+   */
+  public RecruitResDto(Recruit recruit) {
+    this.id = recruit.getId();
+    this.companyName = recruit.getCompany().getName();
+    this.position = recruit.getPosition();
+    this.reward = recruit.getReward();
+    this.content = recruit.getContent();
+    this.skill = recruit.getSkill();
+  }
+}
+
+/**
+ * 채용공고들을 담아 전달하는 Response Dto
+ */
+@Getter
+@AllArgsConstructor
+public class RecruitListResDto {
+
+  private List<RecruitResDto> data;
+
+  // 생성 반환
+  public static RecruitListResDto form(List<RecruitResDto> recruits) {
+    return new RecruitListResDto(recruits);
+  }
+}
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RecruitService {
+  //...
+
+  /**
+   * 채용공고 목록 조회
+   *
+   * @param search 검색명
+   * @return 채용공고 목록 Response Dto
+   */
+  public RecruitListResDto getRecruits(String search) {
+    //검색에 맞는 채용공고들
+    List<Recruit> recruits = recruitRepository.searchRecruits(search);
+
+    // ResponseDto 형식으로 변경 후 반환
+    return RecruitListResDto.form(
+        recruits.stream()
+            .map(RecruitResDto::new)
+            .toList());
+  }
+}
+```
+
+`controller`에서 200의 상태코드와 검색된 결과의 채용공고 목록들을 담아 `Response` 합니다.
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/recruit")
+public class RecruitController {
+  //...
+
+  /**
+   * 채용공고 검색 및 목록 조회
+   *
+   * @param search 검색명
+   * @return 200, 채용공고 목록
+   */
+  @GetMapping("")
+  public ResponseEntity<RecruitListResDto> getRecruits(
+      @RequestParam(required = false, defaultValue = "") String search
+  ) {
+    RecruitListResDto response = recruitService.getRecruits(search);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+}
+```
 
 ### 5. 채용 상세 페이지를 가져옵니다.
 
@@ -814,17 +954,41 @@ class RecruitControllerTest extends TestHelper {
 }
 ```
 
-### 4-1. 채용공고 목록 조회
+### 4 채용공고 목록 조회
 
 #### Request
 
+- Get `/api/v1/recruit`
+
+```json
+
+```
+
+- Get `/api/v1/recruit?search=WanteD`
+
+```json
+
+```
+
 #### Response
 
-### 4-2. 채용공고 검색 목록 조회
+- 200 Ok
 
-#### Request
-
-#### Response
+```json
+{
+  "data": [
+    {
+      "id": 5,
+      "companyName": "WANTED",
+      "position": "PM",
+      "reward": 2000000,
+      "content": "원티드 PM 모집",
+      "skill": "CI/CD"
+    },
+    ...
+  ]
+}
+```
 
 ### 5. 채용공고 상세 페이지 조회
 
