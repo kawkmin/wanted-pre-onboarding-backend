@@ -7,6 +7,7 @@ import com.wanted.wantedpreonboardingbackend.TestHelper;
 import com.wanted.wantedpreonboardingbackend.domain.company.dao.CompanyRepository;
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,6 +43,59 @@ class RecruitRepositoryTest extends TestHelper {
       Recruit findRecruit = recruitRepository.findById(recruit.getId()).orElseThrow();
 
       assertThat(findRecruit).isEqualTo(recruit);
+    }
+  }
+
+  @Nested
+  @DisplayName("채용공고 조회 테스트")
+  class RecruitReadTest {
+
+    /**
+     * 2개의 채용공고 추가저장
+     */
+    @BeforeEach
+    void setUp() {
+      // 회사이름이 "ㅋㅌㅊ"인 채용공고
+      recruitRepository.save(Recruit.builder()
+          .company(Company.allBuilder()
+              .id(1L)
+              .region("region")
+              .country("country")
+              .name("ㅋㅌㅊ")
+              .build())
+          .skill("skill")
+          .reward(1)
+          .content("content")
+          .position("positon")
+          .build());
+
+      // 포지션명이 "쵳ㅋ"인 채용공고
+      recruitRepository.save(Recruit.builder()
+          .company(Company.allBuilder()
+              .id(1L)
+              .region("region")
+              .country("country")
+              .name("name")
+              .build())
+          .skill("skill")
+          .reward(1)
+          .content("content")
+          .position("쵳ㅋ")
+          .build());
+    }
+
+    @Test
+    @DisplayName("채용공고 목록을 정상적으로 불러온다.")
+    void 채용공고_목록을_정상적으로_불러온다() {
+      List<Recruit> recruits = recruitRepository.searchRecruits("");
+      assertThat(recruits.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("검색 기능이 정상적으로 작동한다")
+    void 검색_기능이_정상적으로_작동한다() {
+      List<Recruit> recruits = recruitRepository.searchRecruits("쵳ㅋ");
+      assertThat(recruits.size()).isEqualTo(1);
     }
   }
 
