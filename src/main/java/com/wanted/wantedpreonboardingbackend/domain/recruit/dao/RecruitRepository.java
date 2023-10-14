@@ -2,6 +2,8 @@ package com.wanted.wantedpreonboardingbackend.domain.recruit.dao;
 
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,5 +28,15 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
           "OR lower(r.company.country) LIKE lower(concat('%',:search,'%') )"
   )
   List<Recruit> searchRecruits(@Param("search") String search);
+
+
+  /**
+   * 회사와 같이 id로 조회
+   *
+   * @param recruitId 채용공고 아이디
+   * @return 채용공고
+   */
+  @EntityGraph(attributePaths = {"company"})
+  Optional<Recruit> findWithCompanyById(Long recruitId);
 
 }

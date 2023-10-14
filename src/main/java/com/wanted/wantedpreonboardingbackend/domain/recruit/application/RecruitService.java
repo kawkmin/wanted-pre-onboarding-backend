@@ -5,6 +5,7 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dao.RecruitRepository;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitDetailResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitListResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
@@ -50,6 +51,21 @@ public class RecruitService {
         recruits.stream()
             .map(RecruitResDto::new)
             .toList());
+  }
+
+  /**
+   * 채용공고 상세 조회
+   *
+   * @param recruitId 채용공고 id
+   * @return 채용공고 상세 정보 Response Dto
+   */
+  public RecruitDetailResDto getDetailRecruit(Long recruitId) {
+    // id로 채용공고 조회. 없으면 예외 발생
+    Recruit recruit = recruitRepository.findWithCompanyById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    return new RecruitDetailResDto(recruit);
   }
 
   /**

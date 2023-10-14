@@ -5,6 +5,7 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.application.RecruitService;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitDetailResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitListResDto;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -61,6 +62,20 @@ public class RecruitController {
       @RequestParam(required = false, defaultValue = "") String search
   ) {
     RecruitListResDto response = recruitService.getRecruits(search);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  /**
+   * 채용공고 상세 조회
+   *
+   * @param recruitId 채용공고 id
+   * @return 200, 채용공고 상세 내용
+   */
+  @GetMapping("/{recruitId}")
+  public ResponseEntity<RecruitDetailResDto> getRecruit(
+      @PathVariable Long recruitId
+  ) {
+    RecruitDetailResDto response = recruitService.getDetailRecruit(recruitId);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
