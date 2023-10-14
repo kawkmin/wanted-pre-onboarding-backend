@@ -33,7 +33,7 @@
 
 ## ERD
 
-![image](https://github.com/kawkmin/wanted-pre-onboarding-backend/assets/86940335/2a787849-5987-4ef6-abf2-9c7e916db1ae)
+![image](https://github.com/kawkmin/wanted-pre-onboarding-backend/assets/86940335/ac7a31c6-bbad-4b1d-9c73-e7680cb0a478)
 
 ## 요구사항 구현 과정
 
@@ -595,6 +595,10 @@ public class CompanyTestHelper {
     private Long id;
     private String name;
 
+    private String country;
+
+    private String region;
+
     public CompanyBuilder() {
     }
 
@@ -608,10 +612,22 @@ public class CompanyTestHelper {
       return this;
     }
 
+    public CompanyBuilder country(String country) {
+      this.country = country;
+      return this;
+    }
+
+    public CompanyBuilder region(String region) {
+      this.region = region;
+      return this;
+    }
+
     public Company build() {
       return Company.allBuilder()
           .id(id != null ? id : 1L)
           .name(name != null ? name : "테스트 회사 이름")
+          .country(country != null ? country : "테스트 나라 이름")
+          .region(region != null ? region : "테스트 지역 이름")
           .build();
     }
   }
