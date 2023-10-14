@@ -56,6 +56,16 @@ public class Matching {
     대기중, 불합격, 합격
   }
 
+
+  @Builder(builderMethodName = "allBuilder")
+  public Matching(Long id, User user, Recruit recruit, StateEnum state) {
+    this.id = id;
+    this.user = user;
+    this.recruit = recruit;
+    this.state = state;
+  }
+
+
   @Builder
   public Matching(User user, Recruit recruit) {
     this.user = user;

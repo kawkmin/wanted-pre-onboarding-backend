@@ -59,18 +59,19 @@ public class Recruit {
 
   //지원 현황
   @OneToMany(mappedBy = "recruit", cascade = ALL)
-  private final List<Matching> matchings = new ArrayList<>();
+  private List<Matching> matchings = new ArrayList<>();
 
   // 테스트용 빌더
   @Builder(builderMethodName = "allBuilder")
   public Recruit(Long id, Company company, String position, Integer reward, String content,
-      String skill) {
+      String skill, List<Matching> matchings) {
     this.id = id;
     this.company = company;
     this.position = position;
     this.reward = reward;
     this.content = content;
     this.skill = skill;
+    this.matchings = matchings;
   }
 
   @Builder
