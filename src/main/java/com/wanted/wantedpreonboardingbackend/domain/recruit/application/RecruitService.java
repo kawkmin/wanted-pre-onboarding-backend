@@ -37,6 +37,20 @@ public class RecruitService {
   }
 
   /**
+   * id로 채용공고 찾기 구현
+   *
+   * @param recruitId 채용공고 id
+   * @return 채용공고 Entity
+   */
+  public Recruit getRecruitById(Long recruitId) {
+    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    return recruit;
+  }
+
+  /**
    * 채용공고 목록 조회
    *
    * @param search 검색명
@@ -61,9 +75,7 @@ public class RecruitService {
    */
   public RecruitDetailResDto getDetailRecruit(Long recruitId) {
     // id로 채용공고 조회. 없으면 예외 발생
-    Recruit recruit = recruitRepository.findWithCompanyById(recruitId).orElseThrow(
-        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
-    );
+    Recruit recruit = getRecruitById(recruitId);
 
     return new RecruitDetailResDto(recruit);
   }
@@ -80,9 +92,7 @@ public class RecruitService {
   public Long updateRecruit(RecruitUpdateReqDto reqDto, Long recruitId, Company company) {
 
     // id로 채용공고 조회. 없으면 예외 발생
-    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
-        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
-    );
+    Recruit recruit = getRecruitById(recruitId);
 
     // 요청한 회사의 id가 채용공고에 대한 권한이 없으면 예외 발생
     checkAccessibleRecruit(company, recruit);
@@ -103,9 +113,7 @@ public class RecruitService {
   public void deleteRecruit(Long recruitId, Company company) {
 
     // id로 채용공고 조회. 없으면 예외 발생
-    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
-        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
-    );
+    Recruit recruit = getRecruitById(recruitId);
 
     // 요청한 회사의 id가 채용공고에 대한 권한이 없으면 예외 발생
     checkAccessibleRecruit(company, recruit);
