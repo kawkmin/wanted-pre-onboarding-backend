@@ -28,7 +28,7 @@
 - [ ] **사용자**
     - [x] **채용공고** 목록을 확인할 수 있다.
     - [x] 검색된 **채용공고** 목록을 확인할 수 있다.
-    - [ ] **채용공고** 상세 페이지를 확인할 수 있다.
+    - [x] **채용공고** 상세 페이지를 확인할 수 있다.
     - [ ] **채용공고**에 지원할 수 있다.
 
 ## ERD
@@ -666,7 +666,7 @@ public class RecruitService {
 }
 ```
 
-`controller`에서 200의 상태코드와 검색된 결과의 채용공고 목록들을 담아 `Response` 합니다.
+`controller`에서 `200 상태코드`와 검색된 결과의 채용공고 목록들을 담아 `Response` 합니다.
 
 ```java
 
@@ -694,7 +694,92 @@ public class RecruitController {
 
 ### 5. 채용 상세 페이지를 가져옵니다.
 
-관련 PR :
+관련 PR : [#20](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/20)
+
+[[#20 채용공고 상세 정보 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/20)
+
+상세 정보에는 해당 회사의 `다른 채용공고 ID`가 필요합니다.
+
+따라서 `Response Dto`에서 회사의 현재 채용공고의 ID를 제외한 다른 채용공고 ID를 가져옵니다.
+
+```java
+
+@Getter
+public class RecruitDetailResDto {
+
+  //채용공고 ID
+  private Long id;
+
+  //회사 이름
+  private String companyName;
+
+  //회사 나라
+  private String companyCountry;
+
+  //회사 지역
+  private String companyRegion;
+
+  //회사의 다른 채용공고 id
+  private List<Long> companyOtherRecruitIds;
+
+  //채용 포지션명
+  private String position;
+
+  //보상금
+  private Integer reward;
+
+  //채용 내용
+  private String content;
+
+  //사용 기술명
+  private String skill;
+
+  /**
+   * Entity로 Dto로변경
+   *
+   * @param recruit 생성된 채용공고 상세 정보 Response Dto
+   */
+  public RecruitDetailResDto(Recruit recruit) {
+    // 회사의 해당 채용공고는 제외한 나머지 채용공고
+    this.companyOtherRecruitIds = recruit.getCompany().getRecruits().stream()
+        .map(Recruit::getId)
+        .filter(recId -> !Objects.equals(recId, recruit.getId()))
+        .toList();
+    this.id = recruit.getId();
+    this.companyName = recruit.getCompany().getName();
+    this.companyCountry = recruit.getCompany().getCountry();
+    this.companyRegion = recruit.getCompany().getRegion();
+    this.position = recruit.getPosition();
+    this.reward = recruit.getReward();
+    this.content = recruit.getContent();
+    this.skill = recruit.getSkill();
+  }
+}
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RecruitService {
+  //...
+
+  /**
+   * 채용공고 상세 조회
+   *
+   * @param recruitId 채용공고 id
+   * @return 채용공고 상세 정보 Response Dto
+   */
+  public RecruitDetailResDto getDetailRecruit(Long recruitId) {
+    // id로 채용공고 조회. 없으면 예외 발생
+    Recruit recruit = recruitRepository.findWithCompanyById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    return new RecruitDetailResDto(recruit);
+  }
+}
+```
+
+`controller`에서 `200 상태코드`와 채용공고의 상세 정보를 `Response` 합니다.
 
 ### 6. 사용자는 채용공고에 지원합니다.(선택 사항)
 
@@ -1005,7 +1090,42 @@ class RecruitControllerTest extends TestHelper {
 
 #### Request
 
+- Get `/api/v1/recruit/{recruitId}`
+
+```json
+
+```
+
 #### Response
+
+- 200 Ok
+
+```json
+{
+  "id": 4,
+  "companyName": "KAKAO",
+  "companyCountry": "한국",
+  "companyRegion": "수도권",
+  "companyOtherRecruitIds": [
+    7,
+    8,
+    9,
+    10
+  ],
+  "position": "백엔드 주니어 개발자",
+  "reward": 1000000,
+  "content": "카카오 개발자 모집",
+  "skill": "Python"
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "message": "[21] recruitId: 해당 채용공고를 찾을 수 없습니다."
+}
+```
 
 ### 6. 채용공고 등록
 
