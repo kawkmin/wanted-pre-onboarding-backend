@@ -1,12 +1,17 @@
 package com.wanted.wantedpreonboardingbackend.domain.company.entity;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +44,10 @@ public class Company {
   //회사 지역
   @Column(name = "region", nullable = false, length = MAX_REGION_LENGTH)
   private String region;
+
+  //채용공고 (1:N)
+  @OneToMany(mappedBy = "company", cascade = ALL)
+  private final List<Recruit> recruits = new ArrayList<>();
 
   // 단위 테스트용 빌더
   @Builder(builderMethodName = "allBuilder")
