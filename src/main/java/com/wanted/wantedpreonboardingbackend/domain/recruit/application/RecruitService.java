@@ -5,9 +5,12 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dao.RecruitRepository;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitListResDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
 import com.wanted.wantedpreonboardingbackend.global.error.BusinessException;
 import com.wanted.wantedpreonboardingbackend.global.error.ErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,23 @@ public class RecruitService {
   public Long createRecruit(RecruitCreateReqDto reqDto, Company company) {
     Recruit recruit = recruitRepository.save(reqDto.toEntity(company));//생성
     return recruit.getId();
+  }
+
+  /**
+   * 채용공고 목록 조회
+   *
+   * @param search 검색명
+   * @return 채용공고 목록 Response Dto
+   */
+  public RecruitListResDto getRecruits(String search) {
+    //검색에 맞는 채용공고들
+    List<Recruit> recruits = recruitRepository.searchRecruits(search);
+
+    // ResponseDto 형식으로 변경 후 반환
+    return RecruitListResDto.form(
+        recruits.stream()
+            .map(RecruitResDto::new)
+            .toList());
   }
 
   /**
@@ -89,4 +109,5 @@ public class RecruitService {
       throw new BusinessException(company.getId(), "companyId", ErrorCode.RECRUIT_INACCESSIBLE);
     }
   }
+
 }
