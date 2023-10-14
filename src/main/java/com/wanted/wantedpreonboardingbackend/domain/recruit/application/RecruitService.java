@@ -48,13 +48,34 @@ public class RecruitService {
         () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
     );
 
-    // 채용공고의 회사 id가 요청한 회사의 id와 다르면 예외 발생
+    // 요청한 회사의 id가 채용공고에 대한 권한이 없으면 예외 발생
     checkAccessibleRecruit(company, recruit);
 
     // 채용공고 업데이트
     recruit.update(reqDto.toEntity(company));
 
     return recruitId;
+  }
+
+  /**
+   * 채용공고 삭제
+   *
+   * @param recruitId 삭제할 채용공고 ID
+   * @param company   관계 회사
+   */
+  @Transactional
+  public void deleteRecruit(Long recruitId, Company company) {
+
+    // id로 채용공고 조회. 없으면 예외 발생
+    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    // 요청한 회사의 id가 채용공고에 대한 권한이 없으면 예외 발생
+    checkAccessibleRecruit(company, recruit);
+
+    // 채용공고 삭제
+    recruitRepository.delete(recruit);
   }
 
   /**
