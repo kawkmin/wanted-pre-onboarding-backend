@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,11 @@ public class User {
   //사용자 이름
   @Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
   private String name;
+
+  @Builder
+  public User(Long id, String name) {
+    
+    this.id = id;
+    this.name = name;
+  }
 }
