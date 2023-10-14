@@ -424,7 +424,7 @@ public class RecruitService {
 }
 ```
 
-`수정된 채용공고 뷰 URL` 과 201 `상태코드`를 `Response` 합니다.
+`Controller`에서 `수정된 채용공고 뷰 URL` 과 `201 상태코드`를 `Response` 합니다.
 
 ```java
 
@@ -464,7 +464,76 @@ public class RecruitController {
 
 ### 3. 채용공고를 삭제합니다.
 
-관련 PR :
+관련 PR : [#14](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/14)
+
+[[#14 채용공고 삭제 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/14)
+
+채용공고 수정과 비슷하게, `채용공고Service`에서 해당 채용공고에 대한 회사의 권한을 확인 후 삭제합니다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RecruitService {
+  //...
+
+  /**
+   * 채용공고 삭제
+   *
+   * @param recruitId 삭제할 채용공고 ID
+   * @param company   관계 회사
+   */
+  @Transactional
+  public void deleteRecruit(Long recruitId, Company company) {
+
+    // id로 채용공고 조회. 없으면 예외 발생
+    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    // 요청한 회사의 id가 채용공고에 대한 권한이 없으면 예외 발생
+    checkAccessibleRecruit(company, recruit);
+
+    // 채용공고 삭제
+    recruitRepository.delete(recruit);
+  }
+
+}
+```
+
+`Controller`에서 삭제 후 `상태코드 200`을 Response 합니다.
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/recruit")
+public class RecruitController {
+  //...
+
+  /**
+   * 채용공고 삭제
+   *
+   * @param companyId 회사 아이디
+   * @param recruitId 삭제할 채용공고 아이디
+   * @return 200
+   */
+  @DeleteMapping("/{companyId}/{recruitId}")
+  public ResponseEntity<Void> deleteRecruit(
+      @PathVariable Long companyId,
+      @PathVariable Long recruitId
+  ) {
+    // 회사 id로 가져온 회사
+    Company company = companyService.getCompanyById(companyId);
+
+    // 채용공고 삭제
+    recruitService.deleteRecruit(recruitId, company);
+
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
+}
+```
 
 ### 4-1. 채용공고 목록을 가져옵니다.
 
@@ -687,7 +756,35 @@ class RecruitControllerTest extends TestHelper {
 
 #### Request
 
+- delete `api/v1/recurit/{회사id}/{채용공고id}`
+
+```json
+
+```
+
 #### Response
+
+- 200 Ok
+
+```json
+
+```
+
+- 403 Forbidden
+
+```json
+{
+  "message": "[2] companyId: 해당 채용공에 대한 권한이 없습니다."
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "message": "[21] recruitId: 해당 채용공고를 찾을 수 없습니다."
+}
+```
 
 ### 4-1. 채용공고 목록 조회
 
