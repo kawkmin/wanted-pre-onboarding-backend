@@ -16,7 +16,10 @@ public enum ErrorCode {
   RECRUIT_INACCESSIBLE("해당 채용공에 대한 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
   //유저
-  USER_NOT_FOUND("해당 유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+  USER_NOT_FOUND("해당 유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+  //지원 정보
+  ALREADY_MATCH("이미 지원한 사용자 입니다.", HttpStatus.BAD_REQUEST);
 
   //오류 메시지
   private final String message;
