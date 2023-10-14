@@ -12,14 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
 @Table(name = "t_recruit")
 public class Recruit {
@@ -54,6 +52,18 @@ public class Recruit {
   @Column(name = "skill", nullable = false, length = MAX_SKILL_LENGTH)
   private String skill;
 
+  // 테스트용 빌더
+  @Builder(builderMethodName = "allBuilder")
+  public Recruit(Long id, Company company, String position, Integer reward, String content,
+      String skill) {
+    this.id = id;
+    this.company = company;
+    this.position = position;
+    this.reward = reward;
+    this.content = content;
+    this.skill = skill;
+  }
+
   @Builder
   public Recruit(Company company, String position, Integer reward, String content, String skill) {
     this.company = company;
@@ -61,5 +71,13 @@ public class Recruit {
     this.reward = reward;
     this.content = content;
     this.skill = skill;
+  }
+
+
+  public void update(Recruit recruit) {
+    this.position = recruit.position != null ? recruit.position : this.position;
+    this.reward = recruit.reward != null ? recruit.reward : this.reward;
+    this.content = recruit.content != null ? recruit.content : this.content;
+    this.skill = recruit.skill != null ? recruit.skill : this.skill;
   }
 }

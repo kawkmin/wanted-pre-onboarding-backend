@@ -3,6 +3,7 @@ package com.wanted.wantedpreonboardingbackend.domain.recruit.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,6 +13,7 @@ import com.wanted.wantedpreonboardingbackend.domain.company.application.CompanyS
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.application.RecruitService;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -75,6 +77,33 @@ class RecruitControllerTest extends TestHelper {
       given(companyService.getCompanyById(anyLong())).willReturn(company);
 
       mockMvc.perform(post("/api/v1/recruit")
+              .content(objectMapper.writeValueAsString(reqDto))
+              .contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isCreated());
+    }
+  }
+
+  @Nested
+  @DisplayName("채용공고 수정 관련 테스트")
+  class updateRecruit {
+
+    private RecruitUpdateReqDto reqDto;
+
+    @BeforeEach
+    void setUp() {
+      reqDto = RecruitUpdateReqDto.builder()
+          .position("수정 포지션")
+          .content("수정 내용")
+          .build();
+    }
+
+    @Test
+    @DisplayName("채용공고 수정에 성공한다.")
+    void 채용공고_수정에_성공한다() throws Exception {
+      given(recruitService.updateRecruit(any(), any(), any())).willReturn(1L);
+      given(companyService.getCompanyById(anyLong())).willReturn(company);
+
+      mockMvc.perform(patch("/api/v1/recruit/1/1")
               .content(objectMapper.writeValueAsString(reqDto))
               .contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isCreated());

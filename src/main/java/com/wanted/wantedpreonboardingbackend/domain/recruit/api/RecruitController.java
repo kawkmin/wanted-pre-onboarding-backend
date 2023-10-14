@@ -4,11 +4,14 @@ import com.wanted.wantedpreonboardingbackend.domain.company.application.CompanyS
 import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.application.RecruitService;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
+import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +43,31 @@ public class RecruitController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .location(URI.create("/recruit/" + createdRecruitId)) //생성된 채용공고 조회 url 담기
+        .build();
+  }
+
+  /**
+   * 채용공고 수정
+   *
+   * @param companyId 회사 아이디
+   * @param recruitId 채용공고 아이디
+   * @param reqDto    채용공고 수정 Request Dto
+   * @return 201, 수정된 채용공고 location
+   */
+  @PatchMapping("/{companyId}/{recruitId}")
+  public ResponseEntity<Void> updateRecruit(
+      @PathVariable Long companyId,
+      @PathVariable Long recruitId,
+      @RequestBody @Valid RecruitUpdateReqDto reqDto
+  ) {
+    // 회사 id로 가져온 회사
+    Company company = companyService.getCompanyById(companyId);
+
+    // 채용공고 수정 + 아이디 반환
+    Long updatedRecruitId = recruitService.updateRecruit(reqDto, recruitId, company);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .location(URI.create("/recruit/" + updatedRecruitId)) //수정된 채용공고 조회 url 담기
         .build();
   }
 }

@@ -45,7 +45,7 @@
 [#6](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6),
 [#9](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)
 
-[#2 개발 초기 환경 세팅](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/2)
+[[#2 개발 초기 환경 세팅]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/2)
 
 깃허브 PR 및 Issue 탬플릿을 만들어, 형식화된 틀을 사용하였습니다.
 
@@ -54,15 +54,15 @@
 
 요구사항을 분석하여, README에 정리하였습니다.
 
-[#4 erd 기반 entity 및 dao 생성](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/4),
-[#9 지원 정보 entity 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)(refactor)
+[[#4 erd 기반 entity 및 dao 생성]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/4),
+[[#9 지원 정보 entity 구현(refactor)]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/9)
 
 초기에 작성된 ERD를 기반으로, 요구사항에 맞는 Entity 및 DAO를 생성하였습니다.
 
 하지만 잘못된 요구사항 분석으로, 사용자와 채용공고는 N:1 관계가 아닌, N:N임을 알게되었습니다.
 이에, N:N의 중간 Entity인 `지원 정보 Entity`룰 생성하여, N:1 관계로 리팩토링 하였습니다.
 
-[#6 전역 예외 처리 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6)
+[[#6 전역 예외 처리 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/6)
 
 API 통신에서 예외가 발생하면, 원치않은 상태코드 및 메시지를 전송하게 됩니다. 이를 방지하여, 예외 처리를 다음과 같이 직접 구현하였습니다.
 
@@ -207,7 +207,7 @@ public class ExceptionAdvice {
 
 관련 PR : [#10](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
 
-[#10 채용공고 등록 구현](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
+[[#10 채용공고 등록 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/10)
 
 채용 관련 `Controller`에서 `ResponseBody`로 받을 때, `Bean Validation`을 이용하여, 다음과 같이 제약 조건을 걸었습니다.
 
@@ -324,7 +324,143 @@ public class RecruitController {
 
 ### 2. 채용공고를 수정합니다.
 
-관련 PR :
+관련 PR : [#12](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/12)
+
+[[#12 채용공고 수정 구현]](https://github.com/kawkmin/wanted-pre-onboarding-backend/pull/12)
+
+채용 수정 관련 Controller에서 ResponseBody로 받을 때, 사용되는 Request Dto 입니다.
+
+```java
+/**
+ * 채용공고를 변경할 때, Reqest Dto
+ */
+@Getter
+@NoArgsConstructor(access = PRIVATE)
+@AllArgsConstructor(access = PRIVATE)
+@Builder
+public class RecruitUpdateReqDto {
+
+  //채용 포지션명
+  @Nullable
+  private String position;
+
+  //보상금
+  @Nullable
+  private Integer reward;
+
+  //채용 내용
+  @Nullable
+  private String content;
+
+  //사용 기술명
+  @Nullable
+  private String skill;
+
+  /**
+   * Entity로 변경
+   *
+   * @param company 회사 Entity
+   * @return 채용공고 Entity
+   */
+  public Recruit toEntity(Company company) {
+    return Recruit.builder()
+        .company(company)
+        .position(position)
+        .reward(reward)
+        .content(content)
+        .skill(skill)
+        .build();
+  }
+}
+
+```
+
+채용공고를 작성한 회사에서만, 수정이 가능하다고 생각했기에,`채용공고Service`에서 다음과 같이 수정을 진행합니다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RecruitService {
+  //...
+
+  /**
+   * 채용공고 수정
+   *
+   * @param reqDto    채용공고 수정 Request Dto
+   * @param recruitId 수정할 채용공고 ID
+   * @param company   관계 회사
+   * @return 수정된 채용공고 ID
+   */
+  @Transactional
+  public Long updateRecruit(RecruitUpdateReqDto reqDto, Long recruitId, Company company) {
+
+    // id로 채용공고 조회. 없으면 예외 발생
+    Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(
+        () -> new BusinessException(recruitId, "recruitId", ErrorCode.RECRUIT_NOT_FOUND)
+    );
+
+    // 채용공고의 회사 id가 요청한 회사의 id와 다르면 예외 발생
+    checkAccessibleRecruit(company, recruit);
+
+    // 채용공고 업데이트
+    recruit.update(reqDto.toEntity(company));
+
+    return recruitId;
+  }
+
+  /**
+   * 채용공고의 회사 id가 요청한 회사의 id와 다르면 예외를 발생시킵니다.
+   *
+   * @param company 회사
+   * @param recruit 채용공고
+   */
+  private static void checkAccessibleRecruit(Company company, Recruit recruit) {
+    if (!recruit.getCompany().getId().equals(company.getId())) {
+      throw new BusinessException(company.getId(), "companyId", ErrorCode.RECRUIT_INACCESSIBLE);
+    }
+  }
+}
+```
+
+`수정된 채용공고 뷰 URL` 과 201 `상태코드`를 `Response` 합니다.
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/recruit")
+public class RecruitController {
+  //...
+
+  /**
+   * 채용공고 수정
+   *
+   * @param companyId 회사 아이디
+   * @param recruitId 채용공고 아이디
+   * @param reqDto    채용공고 수정 Request Dto
+   * @return 201, 수정된 채용공고 location
+   */
+  @PatchMapping("/{companyId}/{recruitId}")
+  public ResponseEntity<Void> updateRecruit(
+      @PathVariable Long companyId,
+      @PathVariable Long recruitId,
+      @RequestBody @Valid RecruitUpdateReqDto reqDto
+  ) {
+    // 회사 id로 가져온 회사
+    Company company = companyService.getCompanyById(companyId);
+
+    // 채용공고 수정 + 아이디 반환
+    Long updatedRecruitId = recruitService.updateRecruit(reqDto, recruitId, company);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .location(URI.create("/recruit/" + updatedRecruitId)) //수정된 채용공고 조회 url 담기
+        .build();
+  }
+}
+
+```
 
 ### 3. 채용공고를 삭제합니다.
 
@@ -387,9 +523,15 @@ public class CompanyTestHelper {
 
   public final class CompanyBuilder {
 
+    private Long id;
     private String name;
 
     public CompanyBuilder() {
+    }
+
+    public CompanyBuilder id(Long id) {
+      this.id = id;
+      return this;
     }
 
     public CompanyBuilder name(String name) {
@@ -398,7 +540,8 @@ public class CompanyTestHelper {
     }
 
     public Company build() {
-      return Company.builder()
+      return Company.allBuilder()
+          .id(id != null ? id : 1L)
           .name(name != null ? name : "테스트 회사 이름")
           .build();
     }
@@ -505,7 +648,40 @@ class RecruitControllerTest extends TestHelper {
 
 #### Request
 
+- Patch `api/v1/recurit/{회사id}/{채용공고id}`
+
+```json
+{
+  "reward": 1500000,
+  "content": "변경된 채용 내용",
+  "skill": "Python"
+}
+```
+
 #### Response
+
+- 201 Created
+- `Location` : `/recruit/{수정된 채용공고 ID}`
+
+```json
+
+```
+
+- 403 Forbidden
+
+```json
+{
+  "message": "[2] companyId: 해당 채용공에 대한 권한이 없습니다."
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "message": "[21] recruitId: 해당 채용공고를 찾을 수 없습니다."
+}
+```
 
 ### 3. 채용공고 삭제
 

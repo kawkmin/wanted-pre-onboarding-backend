@@ -29,6 +29,13 @@ public class Company {
   //회사 이름
   @Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
   private String name;
+  
+  // 단위 테스트용 빌더
+  @Builder(builderMethodName = "allBuilder")
+  public Company(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
   @Builder
   public Company(String name) {

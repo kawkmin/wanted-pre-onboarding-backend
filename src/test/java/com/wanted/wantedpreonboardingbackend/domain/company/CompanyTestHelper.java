@@ -17,9 +17,15 @@ public class CompanyTestHelper {
 
   public final class CompanyBuilder {
 
+    private Long id;
     private String name;
 
     public CompanyBuilder() {
+    }
+
+    public CompanyBuilder id(Long id) {
+      this.id = id;
+      return this;
     }
 
     public CompanyBuilder name(String name) {
@@ -28,7 +34,8 @@ public class CompanyTestHelper {
     }
 
     public Company build() {
-      return Company.builder()
+      return Company.allBuilder()
+          .id(id != null ? id : 1L)
           .name(name != null ? name : "테스트 회사 이름")
           .build();
     }

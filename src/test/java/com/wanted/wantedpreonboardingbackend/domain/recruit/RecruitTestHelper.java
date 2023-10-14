@@ -26,6 +26,8 @@ public class RecruitTestHelper {
 
   public final class RecruitBuilder {
 
+    //채용공고 Id
+    private Long id;
     //회사
     private Company company;
     //채용 포지션명
@@ -38,6 +40,11 @@ public class RecruitTestHelper {
     private String skill;
 
     public RecruitBuilder() {
+    }
+
+    public RecruitBuilder id(Long id) {
+      this.id = id;
+      return this;
     }
 
     public RecruitBuilder company(Company company) {
@@ -66,7 +73,8 @@ public class RecruitTestHelper {
     }
 
     public Recruit build() {
-      return Recruit.builder()
+      return Recruit.allBuilder()
+          .id(id != null ? id : 1L)
           .company(company != null ? company : companyTestHelper.generate())
           .position(position != null ? position : "테스트 채용 포지션명")
           .reward(reward != null ? reward : 1000)
