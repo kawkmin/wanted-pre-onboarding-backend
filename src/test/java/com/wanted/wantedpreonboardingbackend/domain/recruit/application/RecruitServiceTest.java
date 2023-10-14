@@ -1,5 +1,6 @@
 package com.wanted.wantedpreonboardingbackend.domain.recruit.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -8,7 +9,6 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dao.RecruitRepository;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,18 +50,10 @@ class RecruitServiceTest extends TestHelper {
           .skill(recruit.getSkill())
           .build();
 
-      Recruit newRecruit = new Recruit(
-          1L,
-          company,
-          reqDto.getPosition(),
-          reqDto.getReward(),
-          reqDto.getContent(),
-          reqDto.getSkill());
-
-      given(recruitRepository.save(any(Recruit.class))).willReturn(newRecruit);
+      given(recruitRepository.save(any(Recruit.class))).willReturn(recruit);
 
       Long createdId = recruitService.createRecruit(reqDto, company);
-      Assertions.assertThat(createdId).isEqualTo(1L);
+      assertThat(createdId).isEqualTo(1L);
     }
   }
 }
