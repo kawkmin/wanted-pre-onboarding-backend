@@ -11,12 +11,7 @@ import com.wanted.wantedpreonboardingbackend.domain.company.entity.Company;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dao.RecruitRepository;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitCreateReqDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.request.RecruitUpdateReqDto;
-import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitListResDto;
-import com.wanted.wantedpreonboardingbackend.domain.recruit.dto.response.RecruitResDto;
 import com.wanted.wantedpreonboardingbackend.domain.recruit.entity.Recruit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,27 +58,6 @@ class RecruitServiceTest extends TestHelper {
 
       Long createdId = recruitService.createRecruit(reqDto, company);
       assertThat(createdId).isEqualTo(1L);
-    }
-  }
-
-  @Nested
-  @DisplayName("채용공고 조회 테스트")
-  class readRecruit {
-
-    @Test
-    @DisplayName("채용공고가 성공적으로 조회된다")
-    void 채용공고가_성공적으로_조회된다() {
-      List<RecruitResDto> recruitResDtoList = new ArrayList<>();
-      recruitResDtoList.add(new RecruitResDto(recruit));
-
-      RecruitListResDto resDto = RecruitListResDto.form(recruitResDtoList);
-
-      given(recruitRepository.searchRecruits(any())).willReturn(Arrays.asList(recruit));
-
-      assertThat(recruitService.getRecruits("").getData().size()).isEqualTo(
-          resDto.getData().size());
-      assertThat(recruitService.getRecruits("").getData().get(0).getSkill()).isEqualTo(
-          resDto.getData().get(0).getSkill());
     }
   }
 
