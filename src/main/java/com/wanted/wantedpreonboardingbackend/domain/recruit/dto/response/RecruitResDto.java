@@ -17,6 +17,12 @@ public class RecruitResDto {
   //회사 이름
   private String companyName;
 
+  //회사 나라
+  private String companyCountry;
+
+  //회사 지역
+  private String companyRegion;
+
   //채용 포지션명
   private String position;
 
@@ -29,6 +35,7 @@ public class RecruitResDto {
   //사용 기술명
   private String skill;
 
+
   /**
    * Entity로 Dto변경
    *
@@ -37,6 +44,8 @@ public class RecruitResDto {
   public RecruitResDto(Recruit recruit) {
     this.id = recruit.getId();
     this.companyName = recruit.getCompany().getName();
+    this.companyCountry = recruit.getCompany().getCountry();
+    this.companyRegion = recruit.getCompany().getRegion();
     this.position = recruit.getPosition();
     this.reward = recruit.getReward();
     this.content = recruit.getContent();
